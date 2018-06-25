@@ -107,7 +107,7 @@ let rec ty_unify : ty_constraints -> ty_subst = fun c ->
         match s,t with
           [],[] -> []
         | s::slist,t::tlist -> (s,t)::tytuples_to_c slist tlist
-        | _ -> failwith (__LOC__)
+        | _ -> raise (Type_error __LOC__)
       end
     in ty_unify (c'@tytuples_to_c slist tlist)
   | _ -> raise (Type_error __LOC__)
@@ -140,10 +140,7 @@ let rec gather_ty_constraints : ty_env -> expr -> ty * ty_constraints = fun tenv
         Some a -> (a,[])
       | None -> failwith ("Unbound value "^x)
     end
-  | ELet (p,e1,e2) -> 
-    let (t1,c1) = gather_ty_constraints tenv e1 in
-    let (t2,c2) = gather_ty_constraints ((pattern_ty_to_env p t1)@tenv) e2 in
-    (t2,c1@c2)
+  | ELet (p,e1,e2) -> gather_ty_constraints tenv (EMatch(e1,[(p,e2)]))
   | EIf (e1,e2,e3) -> let (t1,c1) = gather_ty_constraints tenv e1 in
     let (t2,c2) = gather_ty_constraints tenv e2 in
     let (t3,c3) = gather_ty_constraints tenv e3 in
@@ -213,7 +210,7 @@ let rec gather_ty_constraints : ty_env -> expr -> ty * ty_constraints = fun tenv
     in let env' = List.concat (split_and_snd3 teclist)
     in let (tlist,clist) = List.split (List.map (gather_ty_constraints (env'@tenv)) elist)
     in let t_to_c = tlist_to_constraints tlist
-    in (List.hd tlist,t_t'_c@t_to_c@List.concat clist)
+    in (List.hd tlist,c'@t_t'_c@t_to_c@List.concat clist@List.concat (split_and_trd3 teclist))
   | _ -> failwith ("未実装"^__LOC__)
 
 and gather_ty_constraints_pattern : pattern -> ty * ty_env * ty_constraints = fun p ->

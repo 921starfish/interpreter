@@ -23,7 +23,7 @@ let rec find_match : pattern -> value -> env option = fun p v ->
   | PNil,VNil -> Some []
   | PNil,_ -> None
   | PVar px,v -> Some [(px,v)]
-  | PUnder,v -> Some [("\b\b\b\b-",v)]
+  | PUnder,v -> Some []
   | _ -> None
 
 let rec binopelation :binOp -> value -> value -> value = fun op v1 v2 ->
@@ -52,6 +52,9 @@ let rec binopelation :binOp -> value -> value -> value = fun op v1 v2 ->
         if binopelation OpEq a b = VBool true then eq arest brest else VBool false
       | _ -> raise (Eval_error (__LOC__)) 
     in if vlength v1 = vlength v2 then eq v1 v2 else VBool false
+  | OpEq,VNil,VNil -> VBool true
+  | OpEq,(VLCons _),VNil -> VBool false
+  | OpEq,VNil,(VLCons _) -> VBool false
   | OpCons,v1,(VLCons _)
   | OpCons,v1,VNil -> VLCons (v1,v2)
   | _ -> raise (Eval_error (__LOC__^":２項演算エラー"))

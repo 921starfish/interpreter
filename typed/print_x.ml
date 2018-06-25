@@ -30,7 +30,7 @@ let rec string_of_type : ty -> string = fun v ->
   match v with
     TyInt -> "int"
   | TyBool -> "bool"
-  | TyArr (ty1,ty2) -> "("^(string_of_type ty1)^" -> "^(string_of_type ty2)^")"
+  | TyArr (ty1,ty2) -> "("^(string_of_type ty1)^") -> "^(string_of_type ty2)
   | TyId x -> "'"^x
   | TyList t -> (string_of_type t)^" list"
   | TyTuple tlist -> string_of_tlist tlist
